@@ -3,7 +3,12 @@ import sqlite3
 import qrcode
 import uuid
 import hashlib
+import os
 from datetime import datetime, timedelta
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 
 app = Flask(__name__)
 app.secret_key = "dpr_secret_key_2024_secure"  # More secure secret key
