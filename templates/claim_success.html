@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>Klaim Berhasil - DPR Dimsum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button">
+                ◀
+            </a>
+        </div>
+
+        <h1>🥟 DPR Dimsum</h1>
+
+        <div class="success-animation">
+            <div class="success-icon">🎉</div>
+            <h2>{{message}}</h2>
+        </div>
+
+        <div class="claim-details">
+            <h3>📋 Detail Klaim</h3>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">✅</div>
+                    <div class="detail-info">
+                        <strong>Status Klaim</strong>
+                        <p>Berhasil diproses</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">🔄</div>
+                    <div class="detail-info">
+                        <strong>Reset Kupon</strong>
+                        <p>Kupon telah direset ke 0</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">🎯</div>
+                    <div class="detail-info">
+                        <strong>Misi Berikutnya</strong>
+                        <p>Kumpulkan 15 kupon lagi</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">📈</div>
+                    <div class="detail-info">
+                        <strong>Progress</strong>
+                        <p>0 / 15 kupon</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>🚀 Langkah Selanjutnya</h3>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-info">
+                        <strong>Transaksi Baru</strong>
+                        <p>Lakukan pembelian dimsum lagi</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-info">
+                        <strong>Kumpulkan Kupon</strong>
+                        <p>Setiap pembelian dapat 1 kupon</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-info">
+                        <strong>Klaim Lagi</strong>
+                        <p>Klaim paket gratis setelah 15 kupon</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Back Button Styles */
+        .back-button-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-button:hover::before {
+            opacity: 1;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .back-button:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .back-button:active:after {
+            width: 100px;
+            height: 100px;
+        }
+
+        .success-animation {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: rotate 0.6s ease-in-out;
+        }
+
+        .claim-details {
+            margin-bottom: 30px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid #28a745;
+        }
+
+        .detail-icon {
+            font-size: 30px;
+            width: 50px;
+            height: 50px;
+            background: #d4edda;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #155724;
+        }
+
+        .detail-info strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .detail-info p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .next-steps {
+            margin-bottom: 30px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.2);
+        }
+
+        .step-info strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .step-info p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .primary-btn button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .secondary-btn button {
+            background: #6c757d;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .success-icon {
+                font-size: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .detail-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .step-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .success-icon {
+                font-size: 40px;
+            }
+        }
+    </style>
+</body>
+
+</html>

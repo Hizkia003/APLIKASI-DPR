@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>Profile - DPR Dimsum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🥟 DPR Dimsum</h1>
+
+        <div class="user-bar">
+            <div class="user-info">
+                <span class="user-avatar">👤</span>
+                <div class="user-details">
+                    <strong>{{user.full_name}}</strong>
+                    <small>Login: {{user.last_login}}</small>
+                </div>
+            </div>
+            <div class="user-actions">
+                <a href="/dashboard">
+                    <button>🏠 Dashboard</button>
+                </a>
+                <a href="/logout">
+                    <button class="delete-btn">🚪 Logout</button>
+                </a>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>👤 Profile Pengguna</h3>
+
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-info">
+                        <h4>{{user.full_name}}</h4>
+                        <p>@{{user.username}}</p>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <label>📝 Username</label>
+                        <span>{{user.username}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>👤 Nama Lengkap</label>
+                        <span>{{user.full_name}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>🕐 Login Terakhir</label>
+                        <span>{{user.last_login}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>🔐 Status</label>
+                        <span class="status-active">✅ Aktif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="security-section">
+            <h3>🔒 Keamanan</h3>
+
+            <div class="security-card">
+                <h4>🔐 Password</h4>
+                <p>Password saat ini di-hash menggunakan SHA-256 untuk keamanan.</p>
+                <div class="security-note">
+                    <strong>⚠️ Catatan Keamanan:</strong>
+                    <ul>
+                        <li>Ganti password secara berkala</li>
+                        <li>Gunakan password yang kuat (minimal 8 karakter)</li>
+                        <li>Jangan bagikan password ke orang lain</li>
+                        <li>Logout setelah selesai menggunakan aplikasi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h3>📊 Aktivitas Login</h3>
+
+            <div class="activity-card">
+                <div class="activity-item">
+                    <div class="activity-icon">🕐</div>
+                    <div class="activity-info">
+                        <strong>Login Terakhir</strong>
+                        <p>{{user.last_login}}</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">👤</div>
+                    <div class="activity-info">
+                        <strong>Username</strong>
+                        <p>{{user.username}}</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">🔐</div>
+                    <div class="activity-info">
+                        <strong>Status Keamanan</strong>
+                        <p>Aman dengan password hashing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .user-bar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            font-size: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-details strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        .user-details small {
+            opacity: 0.8;
+            font-size: 12px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-actions button {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .profile-section,
+        .security-section,
+        .activity-section {
+            margin-bottom: 30px;
+        }
+
+        .profile-card,
+        .security-card,
+        .activity-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .profile-avatar {
+            font-size: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .profile-info h4 {
+            color: #333;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .profile-info p {
+            color: #6c757d;
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .detail-item span {
+            color: #333;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .security-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .security-note strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .security-note ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+
+        .security-note li {
+            margin-bottom: 5px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-info strong {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .activity-info p {
+            color: #6c757d;
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</body>
+
+</html>

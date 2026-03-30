@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>Edit Pelanggan - DPR Dimsum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button">
+                ◀
+            </a>
+        </div>
+
+        <h1>🍔 DPR Dimsum</h1>
+
+        <div class="customer-info">
+            <p><strong>👤 Nama:</strong> {{customer.name}}</p>
+            <p><strong>📱 Telepon:</strong> {{customer.phone}}</p>
+        </div>
+
+        <div class="form-section">
+            <h3>📱 Edit Kupon (By QR)</h3>
+            <form method="post" action="/generate_qr/{{customer.id}}" class="single-row-form">
+                <input type="hidden" id="rakyat_qr" name="rakyat" value="0">
+                <input type="hidden" id="pejabat_qr" name="pejabat" value="0">
+
+                <div class="coupon-row">
+                    <div class="coupon-item">
+                        <label>🎫 Kupon Rakyat</label>
+                        <div class="coupon-display">
+                            <button type="button" onclick="minusQR('rakyat_qr')">➖</button>
+                            <b id="display_rakyat_qr">0</b>
+                            <button type="button" onclick="plusQR('rakyat_qr')">➕</button>
+                        </div>
+                    </div>
+
+                    <div class="coupon-item">
+                        <label>🎟️ Kupon Pejabat</label>
+                        <div class="coupon-display">
+                            <button type="button" onclick="minusQR('pejabat_qr')">➖</button>
+                            <b id="display_pejabat_qr">0</b>
+                            <button type="button" onclick="plusQR('pejabat_qr')">➕</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="qr-submit-btn">📷 Konfirmasi melalui QR Code</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h3>✏️ Edit Kupon Manual</h3>
+            <form action="/update_coupon" method="post" class="single-row-form">
+                <input type="hidden" name="id" value="{{customer.id}}">
+                <input type="hidden" id="rakyat_input" name="rakyat" value="{{customer.rakyat}}">
+                <input type="hidden" id="pejabat_input" name="pejabat" value="{{customer.pejabat}}">
+
+                <div class="coupon-row">
+                    <div class="coupon-item">
+                        <label>🎫 Kupon Rakyat</label>
+                        <div class="coupon-display">
+                            <button type="button" onclick="minusEdit('rakyat')">➖</button>
+                            <b id="display_rakyat">{{customer.rakyat}}</b>
+                            <button type="button" onclick="plusEdit('rakyat')">➕</button>
+                        </div>
+                    </div>
+
+                    <div class="coupon-item">
+                        <label>🎟️ Kupon Pejabat</label>
+                        <div class="coupon-display">
+                            <button type="button" onclick="minusEdit('pejabat')">➖</button>
+                            <b id="display_pejabat">{{customer.pejabat}}</b>
+                            <button type="button" onclick="plusEdit('pejabat')">➕</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="manual-submit-btn">💾 Update Kupon</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h3>👤 Edit Data Pelanggan</h3>
+            <form action="/update_customer" method="post">
+                <input type="hidden" name="id" value="{{customer.id}}">
+                <label>👤 Nama Pelanggan</label>
+                <input type="text" name="name" value="{{customer.name}}" required>
+
+                <label>📱 Nomor Telepon</label>
+                <input type="text" name="phone" value="{{customer.phone}}" required>
+
+                <button type="submit">💾 Update Data Pelanggan</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h3>🗑️ Hapus Pelanggan</h3>
+            <div class="warning">
+                ⚠️ Peringatan: Tindakan ini tidak dapat dibatalkan! Semua data kupon akan hilang!
+            </div>
+
+            <a href="/delete_customer/{{customer.id}}"
+                onclick="return confirm('Apakah Anda yakin ingin menghapus pelanggan ini? Semua data kupon akan hilang!')">
+                <button class="delete-btn">🗑️ Hapus Pelanggan</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function plusQR(type) {
+            let input = document.getElementById(type);
+            let display = document.getElementById("display_" + type);
+
+            let val = parseInt(input.value) || 0;
+            val += 1;
+
+            input.value = val;
+            display.innerText = val;
+        }
+
+        function minusQR(type) {
+            let input = document.getElementById(type);
+            let display = document.getElementById("display_" + type);
+
+            let val = parseInt(input.value) || 0;
+
+            if (val > 0) {
+                val -= 1;
+                input.value = val;
+                display.innerText = val;
+            }
+        }
+
+        function plusEdit(type) {
+            let input = document.getElementById(type + "_input");
+            let display = document.getElementById("display_" + type);
+
+            let val = parseInt(input.value) || 0;
+            val += 1;
+
+            input.value = val;
+            display.innerText = val;
+        }
+
+        function minusEdit(type) {
+            let input = document.getElementById(type + "_input");
+            let display = document.getElementById("display_" + type);
+
+            let val = parseInt(input.value) || 0;
+
+            if (val > 0) {
+                val -= 1;
+                input.value = val;
+                display.innerText = val;
+            }
+        }
+    </script>
+
+    <style>
+        /* Back Button Styles */
+        .back-button-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-button:hover::before {
+            opacity: 1;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .back-button:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .back-button:active:after {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Single Row Layout Styles */
+        .single-row-form {
+            margin: 0;
+            width: 100%;
+        }
+
+        .coupon-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .coupon-item {
+            flex: 1;
+            min-width: 200px;
+            width: 100%;
+        }
+
+        .coupon-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .coupon-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .coupon-display b {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .qr-submit-btn,
+        .manual-submit-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            white-space: nowrap;
+            height: fit-content;
+            align-self: flex-end;
+        }
+
+        .qr-submit-btn:hover,
+        .manual-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .qr-submit-btn:active,
+        .manual-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Custom styles untuk tombol plus dan minus */
+        .coupon-display button:first-child {
+            background: linear-gradient(135deg, #d4b4b8, #ddb7b5);
+            color: white;
+            border: 2px solid #d4b4b8;
+        }
+
+        .coupon-display button:first-child:hover {
+            background: linear-gradient(135deg, #d4b4b8, #ddb7b5);
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        .coupon-display button:last-child {
+            background: linear-gradient(135deg, #9ae7d0, #a0ecdd);
+            color: white;
+            border: 2px solid #9ae7d0;
+        }
+
+        .coupon-display button:last-child:hover {
+            background: linear-gradient(135deg, #9ae7d0, #a0ecdd);
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .coupon-display button {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .coupon-row {
+                gap: 15px;
+            }
+
+            .coupon-item {
+                min-width: 180px;
+            }
+
+            .qr-submit-btn,
+            .manual-submit-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .coupon-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 15px;
+            }
+
+            .coupon-item {
+                min-width: auto !important;
+                flex: none !important;
+            }
+
+            .qr-submit-btn,
+            .manual-submit-btn {
+                align-self: stretch !important;
+                width: 100% !important;
+                padding: 12px 20px !important;
+                font-size: 14px !important;
+            }
+
+            .coupon-display button {
+                font-size: 16px;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .coupon-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+
+            .coupon-item {
+                min-width: auto !important;
+                flex: none !important;
+            }
+
+            .coupon-item label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .coupon-display {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .coupon-display b {
+                font-size: 16px;
+            }
+
+            .qr-submit-btn,
+            .manual-submit-btn {
+                align-self: stretch !important;
+                width: 100% !important;
+                padding: 10px 16px !important;
+                font-size: 13px !important;
+            }
+
+            .coupon-display button {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .coupon-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+
+            .coupon-item {
+                min-width: auto !important;
+                flex: none !important;
+            }
+
+            .coupon-item label {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            .coupon-display {
+                padding: 6px;
+                gap: 6px;
+            }
+
+            .coupon-display b {
+                font-size: 14px;
+            }
+
+            .qr-submit-btn,
+            .manual-submit-btn {
+                align-self: stretch !important;
+                width: 100% !important;
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+            }
+
+            .coupon-display button {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+
+            .form-section {
+                padding: 15px 10px;
+            }
+
+            .single-row-form {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</body>
+
+</html>

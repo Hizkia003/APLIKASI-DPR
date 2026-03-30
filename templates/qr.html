@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>QR Code - DPR Dimsum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button">
+                ◀
+            </a>
+        </div>
+        <h1>🍔 DPR Dimsum</h1>
+        <h2>📷 Silakan Scan QR Code</h2>
+
+        <div class="qr-display">
+            <img src="/{{qr}}" width="300" alt="QR Code" class="qr-image">
+            <div class="qr-instructions">
+                <h3>📱 Cara Scan QR Code</h3>
+                <ol>
+                    <li>Buka kamera smartphone Anda</li>
+                    <li>Arahkan kamera ke QR code</li>
+                    <li>Tunggu notifikasi atau redirect otomatis</li>
+                    <li>Kupon akan ditambahkan secara otomatis</li>
+                </ol>
+                <div class="qr-tips">
+                    <p><strong>💡 Tips:</strong></p>
+                    <ul>
+                        <li>Pastikan koneksi internet stabil</li>
+                        <li>QR code valid untuk 1x penggunaan</li>
+                        <li>Refresh halaman jika scan gagal</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Back Button Styles */
+        .back-button-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-button:hover::before {
+            opacity: 1;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .back-button:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .back-button:active:after {
+            width: 100px;
+            height: 100px;
+        }
+
+        .qr-display {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-image {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-instructions {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .qr-instructions h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .qr-instructions ol {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .qr-instructions li {
+            margin-bottom: 10px;
+            color: #495057;
+            line-height: 1.5;
+        }
+
+        .qr-tips {
+            margin-top: 20px;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .qr-tips strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .qr-tips ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+
+        .qr-tips li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .qr-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-btn button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        @media (max-width: 768px) {
+            .qr-display {
+                padding: 20px;
+                margin: 15px 0;
+            }
+
+            .qr-image {
+                width: 250px;
+                padding: 10px;
+            }
+
+            .qr-instructions {
+                margin-top: 20px;
+            }
+
+            .qr-instructions h3 {
+                font-size: 16px;
+            }
+
+            .qr-instructions ol {
+                padding: 15px;
+            }
+
+            .qr-instructions li {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .qr-display {
+                padding: 15px;
+                margin: 10px 0;
+            }
+
+            .qr-image {
+                width: 200px;
+                padding: 8px;
+            }
+
+            .qr-instructions h3 {
+                font-size: 14px;
+            }
+
+            .qr-instructions ol {
+                padding: 12px;
+            }
+
+            .qr-instructions li {
+                font-size: 13px;
+            }
+        }
+    </style>
+</body>
+
+</html>
