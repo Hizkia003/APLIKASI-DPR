@@ -434,7 +434,8 @@ def generate_qr(id):
 
     db.commit()
 
-    url = f"https://lithic-tripinnately-noe.ngrok-free.dev/scan/{token}"
+    BASE_URL = "https://aplikasi-dpr-production.up.railway.app"
+    url = f"{BASE_URL}/scan/{token}"
 
     img = qrcode.make(url)
 
