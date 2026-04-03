@@ -38,7 +38,7 @@ body {
 h1,
 h2,
 h3 {
-  color: #333;
+  color: hsl(0, 48%, 49%);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -108,24 +108,15 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
   margin: 5px;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 button:active {
   transform: translateY(0);
-}
-
-/* Special Button Styles */
-button[type="button"] {
-  background: #6c757d;
-  padding: 10px 20px;
-  font-size: 14px;
 }
 
 button[type="submit"] {
@@ -234,16 +225,18 @@ label {
 
 /* Customer Info */
 .customer-info {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  border-left: 4px solid #667eea;
+  .customer-info h3 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: left;
+  }
 }
 
 .customer-info p {
   margin: 5px 0;
-  color: #495057;
+  color: #;
   font-size: 16px;
 }
 

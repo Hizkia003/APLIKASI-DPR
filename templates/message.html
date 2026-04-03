@@ -16,17 +16,25 @@
 
 <body>
     <div class="container">
-        <div class="back-button-container">
-            <a href="javascript:history.back()" class="back-button">
-                ◀
-            </a>
-        </div>
-
         <h1>🍔 DPR Dimsum</h1>
 
         <div class="success-animation">
             <div class="success-icon">🎉</div>
             <h2>Kupon berhasil ditambahkan!</h2>
+        </div>
+
+        <div class="customer-info">
+            <h3>👤 Informasi Pelanggan</h3>
+            <div class="customer-details">
+                <div class="detail-item">
+                    <span class="detail-label">📝 Nama:</span>
+                    <span class="detail-value">{{customer.name}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📱 Telepon:</span>
+                    <span class="detail-value">{{customer.phone}}</span>
+                </div>
+            </div>
         </div>
 
         <div class="progress-section">
@@ -70,87 +78,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="action-buttons">
+            <button onclick="closeWindow()" class="action-btn primary-btn">
+                ✅ Tutup
+            </button>
+        </div>
     </div>
 
+    <script>
+        function closeWindow() {
+            // Coba berbagai metode untuk menutup window
+            if (window.close) {
+                window.close();
+            } else if (window.opener) {
+                window.opener.close();
+            } else {
+                // Jika tidak bisa close, arahkan ke dashboard
+                window.location.href = '/dashboard';
+            }
+        }
+    </script>
+
     <style>
-        /* Back Button Styles */
-        .back-button-container {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 20px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            width: 48px;
-            height: 48px;
-            min-width: 48px;
-            min-height: 48px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .back-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border-radius: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .back-button:hover::before {
-            opacity: 1;
-        }
-
-        .back-button:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .back-button:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-
-        .back-button:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .back-button:active:after {
-            width: 100px;
-            height: 100px;
-        }
-
-        .back-button:active {
-            transform: translateY(0);
-        }
-
         /* Base Styles */
         .success-animation {
             text-align: center;
@@ -236,6 +186,92 @@
             color: #155724;
         }
 
+        /* Customer Info Styles */
+        .customer-info {
+            margin-bottom: 30px;
+        }
+
+        .customer-info h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .customer-details {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #667eea;
+            text-align: right;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .secondary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
         /* Animations */
         @keyframes bounceIn {
             0% {
@@ -274,15 +310,6 @@
 
         /* Tablet Responsive */
         @media (max-width: 768px) {
-            .back-button-container {
-                margin-bottom: 15px;
-            }
-
-            .back-button {
-                padding: 8px 14px;
-                font-size: 13px;
-            }
-
             .success-icon {
                 font-size: 50px;
                 margin-bottom: 12px;
@@ -321,16 +348,6 @@
 
         /* Mobile Responsive */
         @media (max-width: 480px) {
-            .back-button-container {
-                margin-bottom: 12px;
-            }
-
-            .back-button {
-                padding: 8px 12px;
-                font-size: 12px;
-                gap: 6px;
-            }
-
             .success-icon {
                 font-size: 40px;
                 margin-bottom: 10px;

@@ -16,11 +16,6 @@
 
 <body>
     <div class="container">
-        <div class="back-button-container">
-            <a href="javascript:history.back()" class="back-button">
-                ◀
-            </a>
-        </div>
 
         <h1>🍔 DPR Dimsum Dashboard</h1>
 
@@ -55,11 +50,11 @@
         {% endwith %}
 
         <div class="form-section">
-            <h3>➕ Tambah Pelanggan Baru</h3>
+            <h3><b>+</b> Tambah Pelanggan Baru</h3>
             <form action="/add_customer" method="post">
                 <input type="text" name="name" placeholder="👤 Nama pelanggan" required>
                 <input type="text" name="phone" placeholder="📱 Nomor HP" required>
-                <button type="submit">➕ Tambah Pelanggan</button>
+                <button type="submit"><b>+</b> Tambah Pelanggan</button>
             </form>
         </div>
 
@@ -130,10 +125,6 @@
                 <div class="stat-card">
                     <h4>Kupon Pejabat Total</h4>
                     <span class="stat-number">{{customers|sum(attribute='pejabat')}}</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Bisa Klaim Rakyat</h4>
-                    <span class="stat-number">{{customers|selectattr('rakyat', 'ge', 15)|list|length}}</span>
                 </div>
             </div>
         </div>

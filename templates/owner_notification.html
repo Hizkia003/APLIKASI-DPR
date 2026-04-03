@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Notifikasi - DPR Dimsum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button">
+                ◀
+            </a>
+        </div>
+
+        <h1>🍔 DPR Dimsum</h1>
+
+        <div class="notification-content">
+            <div class="notification-icon">⚠️</div>
+            <h2>Terjadi Kesalahan</h2>
+            <p>Template yang diminta tidak ditemukan. Silakan kembali ke dashboard dan coba lagi.</p>
+            <div class="error-details">
+                <p><strong>Kemungkinan penyebab:</strong></p>
+                <ul>
+                    <li>Template tidak ada atau telah dihapus</li>
+                    <li>Route tidak terdefinisi dengan benar</li>
+                    <li>Kesalahan internal server</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/dashboard" class="action-btn primary-btn">
+                🏠 Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+
+    <style>
+        /* Back Button Styles */
+        .back-button-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Notification Styles */
+        .notification-content {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .notification-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .notification-content h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .notification-content p {
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error-details p {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .error-details ul {
+            color: #6c757d;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .error-details li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notification-content {
+                margin: 20px 0;
+                padding: 20px;
+            }
+
+            .notification-icon {
+                font-size: 50px;
+                margin-bottom: 15px;
+            }
+
+            .notification-content h2 {
+                font-size: 20px;
+            }
+
+            .notification-content p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .notification-content {
+                margin: 15px 0;
+                padding: 15px;
+            }
+
+            .notification-icon {
+                font-size: 40px;
+                margin-bottom: 10px;
+            }
+
+            .notification-content h2 {
+                font-size: 18px;
+            }
+
+            .notification-content p {
+                font-size: 13px;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 250px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</body>
+
+</html>

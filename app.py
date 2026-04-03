@@ -13,6 +13,9 @@ if __name__ == "__main__":
 app = Flask(__name__)
 app.secret_key = "dpr_secret_key_2024_secure"  # More secure secret key
 
+# Konfigurasi untuk development
+app.config["DEBUG"] = True
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 # ========================
 # DATABASE
@@ -26,7 +29,7 @@ def get_db():
 
 
 def init_db():
-
+    """Initialize database"""
     db = get_db()
 
     # Create qr_tokens table
@@ -60,20 +63,44 @@ is_active INTEGER DEFAULT 1
 
     db.commit()
 
-    # Create default admin user if not exists
-    admin = db.execute(
-        "SELECT * FROM admin_users WHERE username=?", ("owner",)
-    ).fetchone()
-    if not admin:
-        password_hash = hashlib.sha256("123".encode()).hexdigest()
+    # Create default admin if not exists
+    create_default_admin()
+
+    print("🚀 DPR Dimsum Application Starting...")
+    print("📱 Login Page: http://localhost:5000")
+    print("🔐 Default Login: owner / 123")
+
+
+def create_default_admin():
+    """Create default admin user if not exists"""
+    db = get_db()
+    
+    # Check if admin exists
+    existing_admin = db.execute("SELECT id FROM admin_users LIMIT 1").fetchone()
+    
+    if not existing_admin:
+        # Create default admin
+        default_password = "123"
+        hashed_password = hash_password(default_password)
+        
         db.execute(
-            "INSERT INTO admin_users (username, password_hash, full_name) VALUES (?, ?, ?)",
-            ("owner", password_hash, "Owner DPR Dimsum"),
+            """INSERT INTO admin_users 
+               (username, password_hash, full_name, is_active, created_at) 
+               VALUES (?, ?, ?, 1, ?)""",
+            ("owner", hashed_password, "Default Owner", datetime.now())
         )
         db.commit()
+        
+        print("👤 Default admin user created: owner / 123")
+    else:
+        print("👤 Admin users already exist, keeping existing accounts")
 
 
-init_db()
+def check_admin_exists():
+    """Check if any admin user exists"""
+    db = get_db()
+    admin = db.execute("SELECT id FROM admin_users LIMIT 1").fetchone()
+    return admin is not None
 
 
 def hash_password(password):
@@ -102,104 +129,9 @@ def get_current_user():
     return None
 
 
-# ========================
-# LOGIN & REGISTER
-# ========================
-
-
-@app.route("/reset_admin", methods=["GET", "POST"])
-def reset_admin():
-    """Reset all admin users - only for development/setup"""
-    if request.method == "POST":
-        try:
-            db = get_db()
-
-            # Delete all admin users
-            db.execute("DELETE FROM admin_users")
-            db.commit()
-
-            flash(
-                "✅ Semua akun owner telah direset! Silakan register akun baru.",
-                "success",
-            )
-            return redirect("/register")
-
-        except Exception as e:
-            flash(f"❌ Error: {str(e)}", "error")
-            return redirect("/")
-
-    return render_template("reset_admin.html")
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    # Redirect to dashboard if already logged in
-    if is_logged_in():
-        return redirect("/dashboard")
-
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        confirm_password = request.form.get("confirm_password", "")
-        full_name = request.form.get("full_name", "").strip()
-
-        # Basic validation
-        if not username or not password or not confirm_password or not full_name:
-            flash("❌ Semua field harus diisi!", "error")
-            return render_template("register.html")
-
-        if password != confirm_password:
-            flash("❌ Password dan konfirmasi password tidak sama!", "error")
-            return render_template("register.html")
-
-        if len(password) < 6:
-            flash("❌ Password minimal 6 karakter!", "error")
-            return render_template("register.html")
-
-        try:
-            db = get_db()
-
-            # Check if username already exists
-            existing_user = db.execute(
-                "SELECT id FROM admin_users WHERE username=?",
-                (username,),
-            ).fetchone()
-
-            if existing_user:
-                flash("❌ Username sudah digunakan!", "error")
-                return render_template("register.html")
-
-            # Check if any admin exists
-            existing_admin = db.execute(
-                "SELECT id FROM admin_users LIMIT 1",
-            ).fetchone()
-
-            if existing_admin:
-                flash("❌ Admin sudah terdaftar! Hubungi administrator.", "error")
-                return render_template("register.html")
-
-            # Create new admin user
-            hashed_password = hash_password(password)
-            db.execute(
-                """INSERT INTO admin_users 
-                   (username, password_hash, full_name, is_active, created_at) 
-                   VALUES (?, ?, ?, 1, ?)""",
-                (username, hashed_password, full_name, datetime.now()),
-            )
-            db.commit()
-
-            flash("✅ Registrasi berhasil! Silakan login.", "success")
-            return redirect("/")
-
-        except Exception as e:
-            flash(f"❌ Error: {str(e)}", "error")
-            return render_template("register.html")
-
-    return render_template("register.html")
-
-
 @app.route("/", methods=["GET", "POST"])
 def login():
+    """Halaman utama - cek admin dulu"""
     # Redirect to dashboard if already logged in
     if is_logged_in():
         return redirect("/dashboard")
@@ -244,6 +176,145 @@ def login():
             flash("❌ Terjadi kesalahan sistem. Silakan coba lagi.", "error")
 
     return render_template("login.html")
+
+
+# ========================
+# ERROR HANDLERS
+# ========================
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle 404 errors"""
+    return render_template("owner_notification.html"), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle 500 errors"""
+    return render_template("owner_notification.html"), 500
+
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    """Handle all other exceptions"""
+    return render_template("owner_notification.html"), 500
+
+
+# ========================
+# LOGIN & REGISTER
+# ========================
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    # Redirect to dashboard if already logged in
+    if is_logged_in():
+        return redirect("/dashboard")
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+        full_name = request.form.get("full_name", "").strip()
+
+        # Basic validation
+        if not username or not password or not confirm_password or not full_name:
+            flash("❌ Semua field harus diisi!", "error")
+            return render_template("register.html")
+
+        if password != confirm_password:
+            flash("❌ Password dan konfirmasi password tidak sama!", "error")
+            return render_template("register.html")
+
+        if len(password) < 6:
+            flash("❌ Password minimal 6 karakter!", "error")
+            return render_template("register.html")
+
+        try:
+            db = get_db()
+
+            # Check if username already exists
+            existing_user = db.execute(
+                "SELECT id FROM admin_users WHERE username=?",
+                (username,),
+            ).fetchone()
+
+            if existing_user:
+                flash("❌ Username sudah digunakan!", "error")
+                return render_template("register.html")
+
+            # Create new admin user
+            hashed_password = hash_password(password)
+            db.execute(
+                """INSERT INTO admin_users 
+                   (username, password_hash, full_name, is_active, created_at) 
+                   VALUES (?, ?, ?, 1, ?)""",
+                (username, hashed_password, full_name, datetime.now()),
+            )
+            db.commit()
+
+            flash("✅ Registrasi berhasil! Silakan login.", "success")
+            return redirect("/")
+
+        except Exception as e:
+            flash(f"❌ Error: {str(e)}", "error")
+            return render_template("register.html")
+
+    return render_template("register.html")
+
+
+@app.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    """Halaman reset password"""
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        old_password = request.form.get("old_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        # Basic validation
+        if not username or not old_password or not new_password or not confirm_password:
+            flash("❌ Semua field harus diisi!", "error")
+            return render_template("forgot_password.html")
+
+        if new_password != confirm_password:
+            flash("❌ Password baru dan konfirmasi password tidak sama!", "error")
+            return render_template("forgot_password.html")
+
+        if len(new_password) < 6:
+            flash("❌ Password baru minimal 6 karakter!", "error")
+            return render_template("forgot_password.html")
+
+        try:
+            db = get_db()
+            admin = db.execute(
+                "SELECT * FROM admin_users WHERE username=? AND is_active=1",
+                (username,),
+            ).fetchone()
+
+            if admin and verify_password(old_password, admin["password_hash"]):
+                # Update password
+                hashed_password = hash_password(new_password)
+
+                db.execute(
+                    "UPDATE admin_users SET password_hash=? WHERE id=?",
+                    (hashed_password, admin["id"]),
+                )
+                db.commit()
+
+                flash(
+                    f"✅ Password untuk username '{username}' berhasil direset! Silakan login dengan password baru.",
+                    "success",
+                )
+                return redirect("/")
+            else:
+                flash("❌ Username atau password lama salah!", "error")
+
+        except Exception as e:
+            flash("❌ Terjadi kesalahan sistem. Silakan coba lagi.", "error")
+
+    return render_template("forgot_password.html")
 
 
 @app.route("/logout")
@@ -561,4 +632,9 @@ def delete_customer(id):
     return redirect("/dashboard")
 
 
-app.run(debug=True)
+if __name__ == "__main__":
+    # Jalankan aplikasi dengan konfigurasi development
+    print("🚀 DPR Dimsum Application Starting...")
+    print("📱 Login Page: http://localhost:5000")
+    print("🔐 Default Login: owner / 123")
+    app.run(debug=True, host="0.0.0.0", port=5000)
