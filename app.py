@@ -4,12 +4,17 @@ import qrcode
 import uuid
 import hashlib
 import os
+import io
+import base64
 from datetime import datetime, timedelta
 
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+app = Flask(__name__)
+app.secret_key = "dpr_secret_key_2024_secure"
 
 # Konfigurasi untuk development
 app.config["DEBUG"] = True
@@ -532,11 +537,13 @@ def generate_claim(id, paket):
 
     img = qrcode.make(url)
 
-    path = "static/claim_qr.png"
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
 
-    img.save(path)
+    img_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-    return render_template("qr.html", qr=path)
+    return render_template("qr.html", qr=img_base64)
 
 
 @app.route("/claim/<token>/<paket>")
@@ -630,9 +637,7 @@ def delete_customer(id):
     db.commit()
 
     return redirect("/dashboard")
-
-
-if __name__ == "__main__":
+    
     # Jalankan aplikasi dengan konfigurasi development
     print("🚀 DPR Dimsum Application Starting...")
     print("📱 Login Page: http://localhost:5000")
