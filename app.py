@@ -7,11 +7,9 @@ import os
 from datetime import datetime, timedelta
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    import os
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-app = Flask(__name__)
-app.secret_key = "dpr_secret_key_2024_secure"  # More secure secret key
 
 # Konfigurasi untuk development
 app.config["DEBUG"] = True
@@ -435,11 +433,13 @@ def generate_qr(id):
 
     img = qrcode.make(url)
 
-    path = "static/qr.png"
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
 
-    img.save(path)
+    img_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-    return render_template("qr.html", qr=path)
+    return render_template("qr.html", qr=img_base64)
 
 
 @app.route("/scan/<token>")
@@ -528,7 +528,7 @@ def generate_claim(id, paket):
 
     db.commit()
 
-    url = f"https://lithic-tripinnately-noe.ngrok-free.dev/claim/{token}/{paket}"
+    url = url = f"https://aplikasi-dpr-production.up.railway.app/claim/{token}/{paket}"
 
     img = qrcode.make(url)
 
