@@ -25,12 +25,9 @@ def get_db():
     conn.autocommit = True
     return conn
 
-def init_db():
     """Initialize database"""
     db = get_db()
     cursor = db.cursor()
-
-    if USE_POSTGRESQL:
         # PostgreSQL syntax
         # Create qr_tokens table
         cursor.execute(
@@ -140,8 +137,6 @@ def create_default_admin():
         # Create default admin
         default_password = "123"
         hashed_password = hash_password(default_password)
-
-        if USE_POSTGRESQL:
             cursor.execute(
                 """INSERT INTO admin_users 
                    (username, password_hash, full_name, is_active, created_at) 
@@ -221,8 +216,6 @@ def login():
 
         try:
             db = get_db()
-
-            if USE_POSTGRESQL:
                 cursor = db.cursor(cursor_factory=psycopg2.extras.DictRow)
                 cursor.execute(
                     "SELECT * FROM admin_users WHERE username=%s AND is_active=1",
@@ -499,9 +492,10 @@ def edit_customer(id):
     db = get_db()
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,)).fetchone()
+    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,))
+    data = cursor.fetchone()
 
-    return render_template("edit_customer.html", customer=customer)
+    customer = cursor.fetchone()
 
 
 # ========================
@@ -554,7 +548,7 @@ def generate_qr(id):
 
     img.save(path)
 
-    return render_template("qr.html", qr=path)
+    return render_template("qr.html", qr=img_base64)
 
 
 @app.route("/scan/<token>")
@@ -562,7 +556,7 @@ def scan(token):
 
     db = get_db()
 
-    data = db.execute("SELECT * FROM qr_tokens WHERE token=?", (token,)).fetchone()
+    data = db.execute("SELECT * FROM qr_tokens WHERE token=%s", (token,)).fetchone()
 
     if not data:
         return "QR tidak valid"
@@ -575,13 +569,13 @@ def scan(token):
         (data["rakyat"], data["pejabat"], data["customer_id"]),
     )
 
-    db.execute("UPDATE qr_tokens SET used=1 WHERE token=?", (token,))
+    db.execute("UPDATE qr_tokens SET used=1 WHERE token=%s", (token,))
 
     db.commit()
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute("SELECT * FROM customers WHERE id=%s", (id,))
-    ).fetchone()
+    data = cursor.fetchone()
 
     return render_template("message.html", customer=customer)
 
@@ -624,8 +618,7 @@ def confirm(id, rakyat, pejabat):
     db.commit()
 
     # ambil data terbaru
-    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,)).fetchone()
+    customer = cursor.fetchone()
 
     return render_template("message.html", customer=customer)
 
@@ -660,7 +653,7 @@ def claim(token, paket):
 
     db = get_db()
 
-    data = db.execute("SELECT * FROM qr_tokens WHERE token=?", (token,)).fetchone()
+    data = db.execute("SELECT * FROM qr_tokens WHERE token=%s", (token,)).fetchone()
 
     if not data:
         return "QR tidak valid"
@@ -680,7 +673,7 @@ def claim(token, paket):
 
         message = "Selamat anda mendapatkan 1 paket pejabat gratis"
 
-    db.execute("UPDATE qr_tokens SET used=1 WHERE token=?", (token,))
+    db.execute("UPDATE qr_tokens SET used=1 WHERE token=%s", (token,))
 
     db.commit()
 
