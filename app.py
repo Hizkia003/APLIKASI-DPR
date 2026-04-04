@@ -19,71 +19,11 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dpr_secret_key_2024_secure")
 app.config["DEBUG"] = os.getenv("FLASK_DEBUG", "True").lower() == "true"
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
-# PostgreSQL Configuration
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "dpr_dimsum")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-
-# Database type flag
-USE_POSTGRESQL = False
-
-
-def test_postgresql_connection():
-    """Test if PostgreSQL is available"""
-    try:
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-        )
-        conn.close()
-        return True
-    except:
-        return False
-
-
-# Test PostgreSQL connection
-if test_postgresql_connection():
-    USE_POSTGRESQL = True
-    print("✅ Using PostgreSQL database")
-else:
-    USE_POSTGRESQL = False
-    print("⚠️ PostgreSQL not available, falling back to SQLite")
-    print("💡 Please install PostgreSQL and update .env file for production use")
-
 
 def get_db():
-    """Get database connection (PostgreSQL or SQLite fallback)"""
-    global USE_POSTGRESQL
-    
-    if USE_POSTGRESQL:
-        try:
-            conn = psycopg2.connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                database=DB_NAME,
-                user=DB_USER,
-                password=DB_PASSWORD
-            )
-            return conn
-        except psycopg2.Error as e:
-            print(f"❌ PostgreSQL connection error: {e}")
-            print("🔄 Falling back to SQLite")
-            USE_POSTGRESQL = False
-            # Fallback to SQLite
-            conn = sqlite3.connect("database.db")
-            conn.row_factory = sqlite3.Row
-            return conn
-    else:
-        # Use SQLite
-        conn = sqlite3.connect("database.db")
-        conn.row_factory = sqlite3.Row
-        return conn
-
+    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    conn.autocommit = True
+    return conn
 
 def init_db():
     """Initialize database"""
@@ -558,7 +498,8 @@ def edit_customer(id):
 
     db = get_db()
 
-    customer = db.execute("SELECT * FROM customers WHERE id=?", (id,)).fetchone()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,)).fetchone()
 
     return render_template("edit_customer.html", customer=customer)
 
@@ -637,8 +578,8 @@ def scan(token):
 
     db.commit()
 
-    customer = db.execute(
-        "SELECT * FROM customers WHERE id=?", (data["customer_id"],)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,))
     ).fetchone()
 
     return render_template("message.html", customer=customer)
@@ -682,7 +623,8 @@ def confirm(id, rakyat, pejabat):
     db.commit()
 
     # ambil data terbaru
-    customer = db.execute("SELECT * FROM customers WHERE id=?", (id,)).fetchone()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,)).fetchone()
 
     return render_template("message.html", customer=customer)
 
@@ -749,7 +691,8 @@ def quick_update(id, paket, aksi):
 
     db = get_db()
 
-    customer = db.execute("SELECT * FROM customers WHERE id=?", (id,)).fetchone()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT * FROM customers WHERE id=%s", (id,)).fetchone()
 
     rakyat = customer["rakyat"]
     pejabat = customer["pejabat"]
