@@ -9,7 +9,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = "dpr_secret_key_2024_secure"
+app.secret_key = os.environ.get("SECRET_KEY", "fallback_secret")
 
 def get_db():
     """Get database connection"""
