@@ -539,13 +539,14 @@ def generate_qr(id):
     db = get_db()
 
     db.execute(
-        "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(?,?,?,?)",
+        "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(%s,%s,%s,%s)",
         (token, id, rakyat, pejabat),
     )
 
     db.commit()
 
-    url = f"https://lithic-tripinnately-noe.ngrok-free.dev/scan/{token}"
+    BASE_URL = "https://aplikasi-dpr-production.up.railway.app"
+    url = f"{BASE_URL}/scan/{token}"
 
     img = qrcode.make(url)
 
@@ -637,7 +638,7 @@ def generate_claim(id, paket):
     db = get_db()
 
     db.execute(
-        "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(?,?,?,?)",
+        "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(%s,%s,%s,%s)",
         (token, id, 0, 0),
     )
 
