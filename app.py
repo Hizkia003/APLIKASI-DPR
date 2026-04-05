@@ -4,10 +4,12 @@ import qrcode
 import uuid
 import hashlib
 import os
+import base64
+from io import BytesIO
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = "dpr_secret_key_2024_secure"
+app.secret_key = os.environ.get("SECRET_KEY", "fallback_secret")
 
 def get_db():
     """Get database connection"""
@@ -156,7 +158,7 @@ def update_customer():
 # QR GENERATE
 # ========================
 
-BASE_URL = "https://lithic-tripinnately-noe.ngrok-free.dev"
+base_url = request.host_url.rstrip("/")
 
 @app.route("/generate_qr/<int:id>", methods=["POST"])
 def generate_qr(id):
@@ -172,12 +174,18 @@ def generate_qr(id):
     )
     db.commit()
 
-    url = f"{BASE_URL}/scan/{token}"
-    img = qrcode.make(url)
-    path = "static/qr.png"
-    img.save(path)
+    base_url = request.host_url.rstrip("/")
+    url = f"{base_url}/scan/{token}"
 
-    return render_template("qr.html", qr=path)
+    img = qrcode.make(url)
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render_template("qr.html", qr=qr_base64)
 
 @app.route("/scan/<token>")
 def scan(token):
@@ -287,7 +295,4 @@ def init_db():
 
 if __name__ == "__main__":
     init_db()
-    print("🚀 DPR Dimsum Application Starting...")
-    print("📱 Login Page: http://localhost:5000")
-    print("🔐 Default Login: owner / 123")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run()
