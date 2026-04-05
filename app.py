@@ -11,23 +11,28 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback_secret")
 
+
 def get_db():
     """Get database connection"""
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def hash_password(password):
     """Hash password using SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def verify_password(password, password_hash):
     """Verify password against hash"""
     return hash_password(password) == password_hash
 
+
 def is_logged_in():
     """Check if user is logged in"""
     return "login" in session and session.get("login", False)
+
 
 def get_current_user():
     """Get current logged in user info"""
@@ -39,9 +44,11 @@ def get_current_user():
         }
     return None
 
+
 # ========================
 # LOGIN
 # ========================
+
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -60,13 +67,13 @@ def login():
             db = get_db()
             admin = db.execute(
                 "SELECT * FROM admin_users WHERE username=? AND is_active=1",
-                (username,)
+                (username,),
             ).fetchone()
 
             if admin and verify_password(password, admin["password_hash"]):
                 db.execute(
                     "UPDATE admin_users SET last_login=? WHERE id=?",
-                    (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), admin["id"])
+                    (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), admin["id"]),
                 )
                 db.commit()
 
@@ -87,15 +94,18 @@ def login():
 
     return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     flash("✅ Anda telah berhasil logout!", "success")
     return redirect("/")
 
+
 # ========================
 # DASHBOARD
 # ========================
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -108,9 +118,11 @@ def dashboard():
 
     return render_template("dashboard.html", customers=customers, user=current_user)
 
+
 # ========================
 # CUSTOMER
 # ========================
+
 
 @app.route("/add_customer", methods=["POST"])
 def add_customer():
@@ -123,6 +135,7 @@ def add_customer():
 
     return redirect("/dashboard")
 
+
 @app.route("/delete_customer/<int:id>")
 def delete_customer(id):
     db = get_db()
@@ -131,6 +144,7 @@ def delete_customer(id):
     db.commit()
 
     return redirect("/dashboard")
+
 
 @app.route("/edit_customer/<int:id>")
 def edit_customer(id):
@@ -141,6 +155,7 @@ def edit_customer(id):
     customer = db.execute("SELECT * FROM customers WHERE id=?", (id,)).fetchone()
 
     return render_template("edit_customer.html", customer=customer)
+
 
 @app.route("/update_customer", methods=["POST"])
 def update_customer():
@@ -154,11 +169,11 @@ def update_customer():
 
     return redirect("/dashboard")
 
+
 # ========================
 # QR GENERATE
 # ========================
 
-base_url = request.host_url.rstrip("/")
 
 @app.route("/generate_qr/<int:id>", methods=["POST"])
 def generate_qr(id):
@@ -170,10 +185,11 @@ def generate_qr(id):
     db = get_db()
     db.execute(
         "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(?,?,?,?)",
-        (token, id, rakyat, pejabat)
+        (token, id, rakyat, pejabat),
     )
     db.commit()
 
+    # Use dynamic base URL for Railway
     base_url = request.host_url.rstrip("/")
     url = f"{base_url}/scan/{token}"
 
@@ -186,6 +202,7 @@ def generate_qr(id):
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
     return render_template("qr.html", qr=qr_base64)
+
 
 @app.route("/scan/<token>")
 def scan(token):
@@ -200,7 +217,7 @@ def scan(token):
 
     db.execute(
         "UPDATE customers SET rakyat=rakyat+?, pejabat=pejabat+? WHERE id=?",
-        (data["rakyat"], data["pejabat"], data["customer_id"])
+        (data["rakyat"], data["pejabat"], data["customer_id"]),
     )
     db.execute("UPDATE qr_tokens SET used=1 WHERE token=?", (token,))
     db.commit()
@@ -211,32 +228,39 @@ def scan(token):
 
     return render_template("message.html", customer=customer)
 
+
 # ========================
 # ERROR HANDLERS
 # ========================
+
 
 @app.errorhandler(404)
 def not_found(error):
     return render_template("owner_notification.html"), 404
 
+
 @app.errorhandler(500)
 def internal_error(error):
     return render_template("owner_notification.html"), 500
+
 
 @app.errorhandler(Exception)
 def handle_exception(error):
     return render_template("owner_notification.html"), 500
 
+
 # ========================
 # INIT DATABASE
 # ========================
+
 
 def init_db():
     """Initialize database"""
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS admin_users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
@@ -246,9 +270,11 @@ def init_db():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             is_active INTEGER DEFAULT 1
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS customers(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
@@ -256,9 +282,11 @@ def init_db():
             rakyat INTEGER DEFAULT 0,
             pejabat INTEGER DEFAULT 0
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS qr_tokens(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             token TEXT,
@@ -267,7 +295,8 @@ def init_db():
             pejabat INTEGER,
             used INTEGER DEFAULT 0
         )
-    """)
+    """
+    )
 
     db.commit()
 
@@ -277,14 +306,14 @@ def init_db():
     if not existing_admin:
         default_password = "123"
         hashed_password = hash_password(default_password)
-        
+
         cursor.execute(
             """INSERT INTO admin_users 
                (username, password_hash, full_name, is_active, created_at) 
                VALUES (?, ?, ?, 1, ?)""",
-            ("owner", hashed_password, "Default Owner", datetime.now())
+            ("owner", hashed_password, "Default Owner", datetime.now()),
         )
-        
+
         db.commit()
         print("👤 Default admin user created: owner / 123")
     else:
@@ -292,6 +321,7 @@ def init_db():
 
     cursor.close()
     db.close()
+
 
 if __name__ == "__main__":
     init_db()
