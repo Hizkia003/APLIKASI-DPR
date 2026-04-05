@@ -117,6 +117,96 @@ def forgot_password():
     return render_template("forgot_password.html")
 
 
+@app.route("/profile")
+def profile():
+    if not is_logged_in():
+        return redirect("/")
+    current_user = get_current_user()
+    return render_template("profile.html", user=current_user)
+
+
+@app.route("/generate_claim/<int:id>/<paket>")
+def generate_claim(id, paket):
+    if not is_logged_in():
+        return redirect("/")
+
+    token = str(uuid.uuid4())
+
+    db = get_db()
+    db.execute(
+        "INSERT INTO qr_tokens(token, customer_id, rakyat, pejabat) VALUES(?,?,?,?)",
+        (token, id, 0, 0),
+    )
+    db.commit()
+
+    base_url = request.host_url.rstrip("/")
+    url = f"{base_url}/claim/{token}/{paket}"
+
+    img = qrcode.make(url)
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render_template("qr.html", qr=qr_base64)
+
+
+@app.route("/claim/<token>/<paket>")
+def claim(token, paket):
+    db = get_db()
+    data = db.execute("SELECT * FROM qr_tokens WHERE token=?", (token,)).fetchone()
+
+    if not data:
+        return "QR tidak valid"
+
+    if data["used"] == 1:
+        return "QR sudah digunakan"
+
+    if paket == "rakyat":
+        db.execute("UPDATE customers SET rakyat=0 WHERE id=?", (data["customer_id"],))
+        message = "Selamat anda mendapatkan 1 paket rakyat gratis"
+    else:
+        db.execute("UPDATE customers SET pejabat=0 WHERE id=?", (data["customer_id"],))
+        message = "Selamat anda mendapatkan 1 paket pejabat gratis"
+
+    db.execute("UPDATE qr_tokens SET used=1 WHERE token=?", (token,))
+    db.commit()
+
+    return render_template("claim_success.html", message=message)
+
+
+@app.route("/quick_update/<int:id>/<paket>/<aksi>")
+def quick_update(id, paket, aksi):
+    if not is_logged_in():
+        return redirect("/")
+
+    db = get_db()
+    customer = db.execute("SELECT * FROM customers WHERE id=?", (id,)).fetchone()
+
+    rakyat = customer["rakyat"]
+    pejabat = customer["pejabat"]
+
+    if paket == "rakyat":
+        if aksi == "plus":
+            rakyat += 1
+        else:
+            rakyat = max(0, rakyat - 1)
+    elif paket == "pejabat":
+        if aksi == "plus":
+            pejabat += 1
+        else:
+            pejabat = max(0, pejabat - 1)
+
+    db.execute(
+        "UPDATE customers SET rakyat=?, pejabat=? WHERE id=?", (rakyat, pejabat, id)
+    )
+    db.commit()
+
+    return redirect("/edit_customer/" + str(id))
+
+
 # ========================
 # DASHBOARD
 # ========================
