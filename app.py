@@ -107,8 +107,56 @@ def logout():
 # ========================
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        # Validasi input
+        if not full_name or not username or not password:
+            flash("❌ Semua field harus diisi!", "error")
+            return render_template("register.html")
+
+        if password != confirm_password:
+            flash("❌ Password tidak cocok!", "error")
+            return render_template("register.html")
+
+        if len(password) < 6:
+            flash("❌ Password minimal 6 karakter!", "error")
+            return render_template("register.html")
+
+        try:
+            db = get_db()
+
+            # Cek username sudah ada
+            existing_user = db.execute(
+                "SELECT id FROM admin_users WHERE username=?", (username,)
+            ).fetchone()
+
+            if existing_user:
+                flash("❌ Username sudah digunakan!", "error")
+                return render_template("register.html")
+
+            # Buat user baru
+            hashed_password = hash_password(password)
+            db.execute(
+                """INSERT INTO admin_users 
+                   (username, password_hash, full_name, is_active, created_at) 
+                   VALUES (?, ?, ?, 1, ?)""",
+                (username, hashed_password, full_name, datetime.now()),
+            )
+            db.commit()
+
+            flash("✅ Akun berhasil dibuat! Silakan login.", "success")
+            return redirect("/")
+
+        except Exception as e:
+            flash("❌ Terjadi kesalahan. Silakan coba lagi.", "error")
+            return render_template("register.html")
+
     return render_template("register.html")
 
 
@@ -215,7 +263,7 @@ def quick_update(id, paket, aksi):
 @app.route("/dashboard")
 def dashboard():
     if not is_logged_in():
-        return redirect("/")
+        return redirect("/") 
 
     db = get_db()
     customers = db.execute("SELECT * FROM customers ORDER BY name").fetchall()
