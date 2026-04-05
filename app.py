@@ -103,6 +103,21 @@ def logout():
 
 
 # ========================
+# REGISTER & FORGOT PASSWORD
+# ========================
+
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+
+@app.route("/forgot_password")
+def forgot_password():
+    return render_template("forgot_password.html")
+
+
+# ========================
 # DASHBOARD
 # ========================
 
