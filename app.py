@@ -263,7 +263,7 @@ def quick_update(id, paket, aksi):
 @app.route("/dashboard")
 def dashboard():
     if not is_logged_in():
-        return redirect("/") 
+        return redirect("/")
 
     db = get_db()
     customers = db.execute("SELECT * FROM customers ORDER BY name").fetchall()
@@ -343,8 +343,14 @@ def generate_qr(id):
     db.commit()
 
     # Use dynamic base URL for Railway
-    base_url = request.host_url.rstrip("/")
+    if request.environ.get("HTTP_X_FORWARDED_PROTO"):
+        base_url = f"{request.environ.get('HTTP_X_FORWARDED_PROTO')}://{request.environ.get('HTTP_HOST')}"
+    else:
+        base_url = request.host_url.rstrip("/")
+
     url = f"{base_url}/scan/{token}"
+
+    print(f"📷 QR URL generated: {url}")
 
     img = qrcode.make(url)
 
@@ -359,14 +365,22 @@ def generate_qr(id):
 
 @app.route("/scan/<token>")
 def scan(token):
+    print(f"🔍 Scanning QR token: {token}")
+
     db = get_db()
     data = db.execute("SELECT * FROM qr_tokens WHERE token=?", (token,)).fetchone()
 
     if not data:
+        print("❌ QR tidak valid")
         return "QR tidak valid"
 
     if data["used"] == 1:
+        print("❌ QR sudah digunakan")
         return "QR sudah digunakan"
+
+    print(
+        f"📊 Processing: rakyat={data['rakyat']}, pejabat={data['pejabat']}, customer_id={data['customer_id']}"
+    )
 
     db.execute(
         "UPDATE customers SET rakyat=rakyat+?, pejabat=pejabat+? WHERE id=?",
@@ -378,6 +392,8 @@ def scan(token):
     customer = db.execute(
         "SELECT * FROM customers WHERE id=?", (data["customer_id"])
     ).fetchone()
+
+    print(f"✅ QR scanned successfully for customer: {customer['name']}")
 
     return render_template("message.html", customer=customer)
 
